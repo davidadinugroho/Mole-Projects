@@ -7,6 +7,7 @@
 <link href="https://fonts.googleapis.com/css2?family=Barlow+Condensed:wght@300;400;500;600;700;800&family=Barlow:wght@300;400;500;600&display=swap" rel="stylesheet">
 <script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/4.4.1/chart.umd.min.js"></script>
 <script src="https://cdnjs.cloudflare.com/ajax/libs/xlsx/0.18.5/xlsx.full.min.js"></script>
+<script src="https://accounts.google.com/gsi/client" async defer></script>
 <style>
 :root {
   --bg: #0c0e0f;
@@ -1013,7 +1014,7 @@ function exportData() {
   const rows=[['Month','Budget (MIDR)','Actual (MIDR)','Plan (MIDR)','Revenue (MIDR)','Margin%','Achievement%','Gap','PS Note']];
   MONTHS.forEach((m,i)=>{
     const att=ACTUAL.margin[i]!=null?((ACTUAL.margin[i]/BUDGET_MARGIN[i])*100).toFixed(2)+'%':'';
-    const gap=ACTUAL.margin[i]!=null?(ACTUAL.margin[i]-BUDGET_MARGIN[i]).toFixed(3):'';
+    const gap=ACTUAL.margin[i]!=null?(ACTUAL.margin[i]-BUDGET_MARGIN[i]).toFixed(1):'';
     const mPct=ACTUAL.margin[i]!=null&&ACTUAL.revenue[i]!=null?((ACTUAL.margin[i]/ACTUAL.revenue[i])*100).toFixed(2)+'%':'';
     const ps=i===0?'Jan: SSSC12A+12B+Youfa7+Mlion9A+9B':i===1?'Feb: Youfa8+Youfa9':'';
     rows.push([m,BUDGET_MARGIN[i],ACTUAL.margin[i]??'',ACTUAL.plan[i]??'',ACTUAL.revenue[i]??'',mPct,att,gap,ps]);
@@ -1067,9 +1068,9 @@ function openModal(idx){
     let html=`<div class="modal-ps-title">📋 PS Consolidated · ${monthLabel} · ${chains.length} Proyek</div>`;
     chains.forEach((c,i)=>{
       const col=colors[i%colors.length];
-      html+=`<div style="margin-bottom:10px;padding-bottom:10px;border-bottom:1px solid rgba(255,255,255,0.06)"><div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:6px;"><div style="font-size:9px;letter-spacing:2px;text-transform:uppercase;color:${col}">${c.name} · ${c.ps}</div><div style="font-family:'Barlow Condensed',sans-serif;font-size:14px;font-weight:700;color:var(--ok)">IDR ${c.margin.toFixed(3)} M · ${c.pct}%</div></div><div class="modal-ps-grid"><div class="modal-ps-item"><div class="modal-ps-label">Revenue</div><div class="modal-ps-val" style="color:var(--actual);font-size:13px">IDR ${c.revenue.toLocaleString('id-ID',{maximumFractionDigits:3})} M</div><div class="modal-ps-sub">${c.customer}</div></div><div class="modal-ps-item"><div class="modal-ps-label">Net Margin</div><div class="modal-ps-val" style="color:var(--ok);font-size:13px">IDR ${c.margin.toFixed(3)} M</div><div class="modal-ps-sub">${c.pct}% consolidated</div></div></div></div>`;
+      html+=`<div style="margin-bottom:10px;padding-bottom:10px;border-bottom:1px solid rgba(255,255,255,0.06)"><div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:6px;"><div style="font-size:9px;letter-spacing:2px;text-transform:uppercase;color:${col}">${c.name} · ${c.ps}</div><div style="font-family:'Barlow Condensed',sans-serif;font-size:14px;font-weight:700;color:var(--ok)">IDR ${c.margin.toFixed(1)} M · ${c.pct}%</div></div><div class="modal-ps-grid"><div class="modal-ps-item"><div class="modal-ps-label">Revenue</div><div class="modal-ps-val" style="color:var(--actual);font-size:13px">IDR ${c.revenue.toLocaleString('id-ID',{maximumFractionDigits:1})} M</div><div class="modal-ps-sub">${c.customer}</div></div><div class="modal-ps-item"><div class="modal-ps-label">Net Margin</div><div class="modal-ps-val" style="color:var(--ok);font-size:13px">IDR ${c.margin.toFixed(1)} M</div><div class="modal-ps-sub">${c.pct}% consolidated</div></div></div></div>`;
     });
-    html+=`<div style="background:rgba(34,211,238,0.06);border-radius:6px;padding:10px 12px;"><div style="font-size:9px;letter-spacing:2px;text-transform:uppercase;color:var(--actual);margin-bottom:8px;">Total ${monthLabel}</div><div class="modal-ps-grid"><div class="modal-ps-item"><div class="modal-ps-label">Total Revenue</div><div class="modal-ps-val" style="color:var(--actual)">IDR ${totalRev.toLocaleString('id-ID',{maximumFractionDigits:3})} M</div><div class="modal-ps-sub">${chains.length} proyek</div></div><div class="modal-ps-item"><div class="modal-ps-label">Total Net Margin</div><div class="modal-ps-val" style="color:var(--ok)">IDR ${totalMargin.toFixed(3)} M</div><div class="modal-ps-sub">${totalPct}% of revenue</div></div></div></div>`;
+    html+=`<div style="background:rgba(34,211,238,0.06);border-radius:6px;padding:10px 12px;"><div style="font-size:9px;letter-spacing:2px;text-transform:uppercase;color:var(--actual);margin-bottom:8px;">Total ${monthLabel}</div><div class="modal-ps-grid"><div class="modal-ps-item"><div class="modal-ps-label">Total Revenue</div><div class="modal-ps-val" style="color:var(--actual)">IDR ${totalRev.toLocaleString('id-ID',{maximumFractionDigits:1})} M</div><div class="modal-ps-sub">${chains.length} proyek</div></div><div class="modal-ps-item"><div class="modal-ps-label">Total Net Margin</div><div class="modal-ps-val" style="color:var(--ok)">IDR ${totalMargin.toFixed(1)} M</div><div class="modal-ps-sub">${totalPct}% of revenue</div></div></div></div>`;
     psInner.innerHTML=html;
   } else {
     psSection.style.display='none';
@@ -1645,13 +1646,13 @@ Jawab SPESIFIK sesuai pertanyaan. Jika ditanya tentang produk/qty tertentu, jawa
 BUDGET BULANAN (MIDR): ${BUDGET_MARGIN.map((v,i)=>MONTHS[i]+'='+v).join(', ')}
 FULL YEAR BUDGET: ${BUDGET_MARGIN.reduce((a,b)=>a+b,0)} MIDR
 
-AKTUAL JANUARI 2026: ${janM?janM.toFixed(3)+' MIDR':'belum ada'} | Achievement: ${janAch||'?'}% | Revenue: ${ACTUAL.revenue[0]?.toFixed(0)||'?'} MIDR
+AKTUAL JANUARI 2026: ${janM?janM.toFixed(1)+' MIDR':'belum ada'} | Achievement: ${janAch||'?'}% | Revenue: ${ACTUAL.revenue[0]?.toFixed(0)||'?'} MIDR
   Proyek Jan: SSSC 12A 702.054M(10.07%), SSSC 12B 345.211M(9.90%), Youfa 7 207.133M(8.17%), Mlion 09A 2436.115M(10.88%), Mlion 09B 2296.507M(10.88%)
 
-AKTUAL FEBRUARI 2026: ${febM?febM.toFixed(3)+' MIDR':'belum ada'} | Achievement: ${febAch||'?'}% | Revenue: ${ACTUAL.revenue[1]?.toFixed(0)||'?'} MIDR
+AKTUAL FEBRUARI 2026: ${febM?febM.toFixed(1)+' MIDR':'belum ada'} | Achievement: ${febAch||'?'}% | Revenue: ${ACTUAL.revenue[1]?.toFixed(0)||'?'} MIDR
   Proyek Feb: Youfa 8 51.389M(7.17%), Youfa 9 R1 320.846M(7.88%)
 
-YTD: Aktual ${ytdActual.toFixed(3)} M vs Budget ${ytdBudget.toFixed(0)} M | Achievement ${ytdPct}% | Margin% ${ytdMPct}%
+YTD: Aktual ${ytdActual.toFixed(1)} M vs Budget ${ytdBudget.toFixed(0)} M | Achievement ${ytdPct}% | Margin% ${ytdMPct}%
 
 === DATA PRODUK & QTY ===${qtyCtx}
 === PERTANYAAN USER ===
@@ -1824,9 +1825,9 @@ Total: Revenue IDR 10,459.440 M · Margin <strong>IDR 1,047.265 M</strong>`;
   // ── 6. FINANSIAL ─────────────────────────────────────────────────────────
   if(has('achievement','pencapaian','capaian'))
     return `<strong>Achievement vs Budget 2026:</strong><br>
-• Januari: <strong>${d.janAch||'?'}%</strong> — actual ${d.janM?.toFixed(3)||'?'} M vs budget ${BUDGET_MARGIN[0]} MIDR<br>
-• Februari: <strong>${d.febAch||'?'}%</strong> — actual ${d.febM?.toFixed(3)||'?'} M vs budget ${BUDGET_MARGIN[1]} MIDR<br>
-<strong>YTD Achievement: ${d.ytdPct}%</strong> · total actual ${d.ytdActual.toFixed(3)} M vs ${d.ytdBudget.toFixed(0)} M`;
+• Januari: <strong>${d.janAch||'?'}%</strong> — actual ${d.janM?.toFixed(1)||'?'} M vs budget ${BUDGET_MARGIN[0]} MIDR<br>
+• Februari: <strong>${d.febAch||'?'}%</strong> — actual ${d.febM?.toFixed(1)||'?'} M vs budget ${BUDGET_MARGIN[1]} MIDR<br>
+<strong>YTD Achievement: ${d.ytdPct}%</strong> · total actual ${d.ytdActual.toFixed(1)} M vs ${d.ytdBudget.toFixed(0)} M`;
 
   if(has('margin %','margin persen','persentase margin')||ql.match(/margin.*%|%.*margin/))
     return `<strong>Margin % per Proyek:</strong><br>
@@ -1845,7 +1846,7 @@ Volume kecil (43 MT) dan margin % terendah. Disusul Youfa 7 — 207.133 M (8.17%
 
   if(has('ytd','year to date') || (has('total','keseluruhan') && has('margin')))
     return `<strong>YTD 2026</strong> (Jan + Feb · 9 proyek):<br>
-Actual: <strong>${d.ytdActual.toFixed(3)} MIDR</strong> · Budget: ${d.ytdBudget.toFixed(0)} MIDR<br>
+Actual: <strong>${d.ytdActual.toFixed(1)} MIDR</strong> · Budget: ${d.ytdBudget.toFixed(0)} MIDR<br>
 Achievement: <strong>${d.ytdPct}%</strong> · Margin %: <strong>${d.ytdMPct}%</strong><br>
 Jan: 5,987.020 M (10.60%) · Feb: 3,300.817 M (14.15%)`;
 
@@ -1857,20 +1858,20 @@ Feb Mlion 10A+10B: IDR <strong>17,070</strong>/USD (Hanwa Singapore)`;
 
   if(has('gap','selisih') || (has('kurang') && has('budget')))
     return `<strong>Gap Actual vs Budget:</strong><br>
-Jan: <strong>${(d.janM-BUDGET_MARGIN[0]>=0?'+':'')+(d.janM-BUDGET_MARGIN[0]).toFixed(3)} MIDR</strong> (actual ${d.janM?.toFixed(3)} vs budget ${BUDGET_MARGIN[0]})<br>
-Feb: <strong>${(d.febM-BUDGET_MARGIN[1]>=0?'+':'')+(d.febM-BUDGET_MARGIN[1]).toFixed(3)} MIDR</strong> (actual ${d.febM?.toFixed(3)} vs budget ${BUDGET_MARGIN[1]})<br>
-<strong>YTD Gap: ${(d.ytdActual-d.ytdBudget>=0?'+':'')+(d.ytdActual-d.ytdBudget).toFixed(3)} MIDR</strong>`;
+Jan: <strong>${(d.janM-BUDGET_MARGIN[0]>=0?'+':'')+(d.janM-BUDGET_MARGIN[0]).toFixed(1)} MIDR</strong> (actual ${d.janM?.toFixed(1)} vs budget ${BUDGET_MARGIN[0]})<br>
+Feb: <strong>${(d.febM-BUDGET_MARGIN[1]>=0?'+':'')+(d.febM-BUDGET_MARGIN[1]).toFixed(1)} MIDR</strong> (actual ${d.febM?.toFixed(1)} vs budget ${BUDGET_MARGIN[1]})<br>
+<strong>YTD Gap: ${(d.ytdActual-d.ytdBudget>=0?'+':'')+(d.ytdActual-d.ytdBudget).toFixed(1)} MIDR</strong>`;
 
   if(inJan && !has('ppgl','welded','sheet','pipe','pipa','coil','qty','volume','berat','produk'))
     return `<strong>Januari 2026</strong> — 5 proyek:<br>
-Margin: <strong>${d.janM?.toFixed(3)||'?'} MIDR</strong> · Achievement: <strong>${d.janAch||'?'}%</strong> vs budget ${BUDGET_MARGIN[0]} MIDR<br>
+Margin: <strong>${d.janM?.toFixed(1)||'?'} MIDR</strong> · Achievement: <strong>${d.janAch||'?'}%</strong> vs budget ${BUDGET_MARGIN[0]} MIDR<br>
 • Mlion 09A: 2,436.115 M (10.88%) · Mlion 09B: 2,296.507 M (10.88%)<br>
 • SSSC 12A: 702.054 M (10.07%) · SSSC 12B: 345.211 M (9.90%) · Youfa 7: 207.133 M (8.17%)<br>
 Volume: PPGL 600 MT + Sheet Pile 3,107 MT + Welded Pipes 177 MT = <strong>3,884 MT</strong>`;
 
   if(inFeb && !has('welded','sheet','pipe','pipa','coil','qty','volume','berat','produk'))
     return `<strong>Februari 2026</strong> — 4 proyek:<br>
-Margin: <strong>${d.febM?.toFixed(3)||'?'} MIDR</strong> · Achievement: <strong>${d.febAch||'?'}%</strong> vs budget ${BUDGET_MARGIN[1]} MIDR<br>
+Margin: <strong>${d.febM?.toFixed(1)||'?'} MIDR</strong> · Achievement: <strong>${d.febAch||'?'}%</strong> vs budget ${BUDGET_MARGIN[1]} MIDR<br>
 • Mlion 10A [Net]: <strong>960.745 M (15.79%)</strong> · Sheet Pile 535 pcs<br>
 • Mlion 10B [Consol. Net]: <strong>1,967.837 M (15.80%)</strong> · Sheet Pile 1,465 pcs<br>
 • Youfa 9 R1: 320.846 M (7.88%) · Youfa 8: 51.389 M (7.17%)<br>
@@ -1925,7 +1926,7 @@ Consolidated Mlion 10B margin diperhitungkan dari purchase BTS (origin cost Hanw
 • <em>"qty PPGL Januari"</em> · <em>"berapa pcs sheet pile"</em> · <em>"welded pipes Februari"</em><br>
 • <em>"detail Youfa 9"</em> · <em>"margin Mlion 09A"</em> · <em>"volume Jan"</em><br>
 • <em>"achievement"</em> · <em>"gap vs budget"</em> · <em>"supplier"</em> · <em>"kurs FX"</em><br>
-YTD: <strong>${d.ytdActual.toFixed(3)} MIDR</strong> aktual · achievement <strong>${d.ytdPct}%</strong>.`;
+YTD: <strong>${d.ytdActual.toFixed(1)} MIDR</strong> aktual · achievement <strong>${d.ytdPct}%</strong>.`;
 }
 
 // ═══════════════════════════════════════════════════════
@@ -2163,7 +2164,7 @@ function renderDrivePanel() {
 
   body.innerHTML = content;
   // Re-attach GAPI if already loaded
-  if (window.gapi && DRIVE.CLIENT_ID && !DRIVE.ACCESS_TOKEN) initGapiClient();
+  if (window.gapi && DRIVE.CLIENT_ID && !DRIVE.ACCESS_TOKEN) initGapiDriveClient();
 }
 
 // ── Setup helpers ─────────────────────────────────────────
@@ -2197,43 +2198,78 @@ function toggleDriveFile(id) {
   renderDrivePanel();
 }
 
-// ── Load Google API ───────────────────────────────────────
+// ── Google Identity Services (GIS) OAuth ─────────────────
+// Uses the modern token-based flow (gapi.auth2 is deprecated since 2023)
+var _tokenClient = null;
+
 function loadGapiScript() {
-  if (window.gapi) { initGapiClient(); return; }
+  // Load gapi for Drive API calls (not for auth)
+  if (window.gapi) { initGapiDriveClient(); return; }
   const s = document.createElement('script');
-  s.src = 'https://apis.google.com/js/api.js';
-  s.onload = () => gapi.load('client:auth2', initGapiClient);
-  s.onerror = () => driveLog('err', '❌ Gagal load Google API — cek koneksi internet');
+  s.src = 'https://apis.googleapis.com/js/api.js';
+  s.onload = () => gapi.load('client', initGapiDriveClient);
+  s.onerror = () => driveLog('err', '❌ Gagal load Google API — cek koneksi');
   document.head.appendChild(s);
 }
-function initGapiClient() {
-  if (!DRIVE.CLIENT_ID) return;
-  gapi.client.init({
-    clientId: DRIVE.CLIENT_ID,
+
+function initGapiDriveClient() {
+  gapi.client.init({}).then(() => {
+    gapi.client.load('https://www.googleapis.com/discovery/v1/apis/drive/v3/rest')
+      .then(() => driveLog('ok', '✅ Drive API loaded'))
+      .catch(e => driveLog('err', '❌ Drive API load error: ' + e));
+  });
+}
+
+function initTokenClient() {
+  if (!DRIVE.CLIENT_ID) { alert('Masukkan Client ID terlebih dahulu'); return null; }
+  if (!window.google || !window.google.accounts) {
+    driveLog('err', '❌ Google Identity Services belum load. Tunggu sebentar lalu coba lagi.');
+    return null;
+  }
+  return google.accounts.oauth2.initTokenClient({
+    client_id: DRIVE.CLIENT_ID,
     scope: DRIVE.SCOPES,
-    discoveryDocs: ['https://www.googleapis.com/discovery/v1/apis/drive/v3/rest']
-  }).then(() => {
-    const auth = gapi.auth2.getAuthInstance();
-    if (auth.isSignedIn.get()) {
-      const u = auth.currentUser.get();
-      DRIVE.ACCESS_TOKEN = u.getAuthResponse().access_token;
-      DRIVE.USER_EMAIL = u.getBasicProfile().getEmail();
-      updateDriveBtn(); renderDrivePanel();
+    callback: (tokenResponse) => {
+      if (tokenResponse.error) {
+        driveLog('err', '❌ Login gagal: ' + tokenResponse.error);
+        renderDrivePanel();
+        return;
+      }
+      DRIVE.ACCESS_TOKEN = tokenResponse.access_token;
+      // Fetch user info
+      fetch('https://www.googleapis.com/oauth2/v3/userinfo', {
+        headers: { Authorization: 'Bearer ' + DRIVE.ACCESS_TOKEN }
+      }).then(r => r.json()).then(info => {
+        DRIVE.USER_EMAIL = info.email || 'Google Account';
+        updateDriveBtn(); renderDrivePanel();
+        driveLog('ok', '✅ Login berhasil: ' + DRIVE.USER_EMAIL);
+        // Load gapi drive client after login
+        if (!window.gapi) loadGapiScript();
+        else if (!gapi.client.drive) initGapiDriveClient();
+      }).catch(() => {
+        DRIVE.USER_EMAIL = 'Google Account';
+        updateDriveBtn(); renderDrivePanel();
+        driveLog('ok', '✅ Login berhasil');
+      });
     }
-  }).catch(e => driveLog('err', '❌ Init gagal: ' + e.error));
+  });
 }
+
 function driveSignIn() {
-  if (!window.gapi) { loadGapiScript(); setTimeout(driveSignIn, 1500); return; }
-  gapi.auth2.getAuthInstance().signIn().then(() => {
-    const u = gapi.auth2.getAuthInstance().currentUser.get();
-    DRIVE.ACCESS_TOKEN = u.getAuthResponse().access_token;
-    DRIVE.USER_EMAIL = u.getBasicProfile().getEmail();
-    updateDriveBtn(); renderDrivePanel();
-    driveLog('ok', '✅ Login berhasil: ' + DRIVE.USER_EMAIL);
-  }).catch(e => { driveLog('err', '❌ Login dibatalkan atau gagal: ' + (e.error||e)); renderDrivePanel(); });
+  if (!DRIVE.CLIENT_ID) { alert('Masukkan Client ID terlebih dahulu'); return; }
+  if (!window.google || !window.google.accounts) {
+    driveLog('err', '❌ Google Identity Services sedang dimuat, coba lagi dalam 2 detik...');
+    setTimeout(driveSignIn, 2000);
+    return;
+  }
+  _tokenClient = initTokenClient();
+  if (_tokenClient) _tokenClient.requestAccessToken({ prompt: 'consent' });
 }
+
 function driveSignOut() {
-  if (window.gapi && gapi.auth2) gapi.auth2.getAuthInstance().signOut();
+  if (DRIVE.ACCESS_TOKEN && window.google && window.google.accounts) {
+    google.accounts.oauth2.revoke(DRIVE.ACCESS_TOKEN, () => {});
+  }
   DRIVE.ACCESS_TOKEN = ''; DRIVE.USER_EMAIL = '';
   updateDriveBtn(); renderDrivePanel();
 }
@@ -2424,16 +2460,24 @@ function parseDriveFile(fileName, arrayBuffer) {
 
 // ── Drive API helper ──────────────────────────────────────
 async function driveApiCall(url) {
-  // Refresh token if expired
-  if (window.gapi && gapi.auth2) {
-    try {
-      const u = gapi.auth2.getAuthInstance().currentUser.get();
-      DRIVE.ACCESS_TOKEN = u.getAuthResponse(true).access_token;
-    } catch(e) {}
-  }
+  // If token expired (401), request new token silently via GIS
   const resp = await fetch(url, { headers: { Authorization: 'Bearer ' + DRIVE.ACCESS_TOKEN } });
-  if (resp.status === 401) { DRIVE.ACCESS_TOKEN = ''; updateDriveBtn(); throw new Error('Token expired — silakan login ulang'); }
-  if (!resp.ok) throw new Error(`API error ${resp.status}`);
+  if (resp.status === 401) {
+    // Try silent token refresh
+    await new Promise((resolve) => {
+      if (!_tokenClient) _tokenClient = initTokenClient();
+      if (_tokenClient) {
+        const origCallback = _tokenClient.callback;
+        _tokenClient.callback = (t) => { if (!t.error) DRIVE.ACCESS_TOKEN = t.access_token; _tokenClient.callback = origCallback; resolve(); };
+        _tokenClient.requestAccessToken({ prompt: '' });
+      } else { resolve(); }
+    });
+    // Retry once with new token
+    const retry = await fetch(url, { headers: { Authorization: 'Bearer ' + DRIVE.ACCESS_TOKEN } });
+    if (!retry.ok) { DRIVE.ACCESS_TOKEN = ''; updateDriveBtn(); throw new Error('Session expired — silakan login ulang'); }
+    return retry.json();
+  }
+  if (!resp.ok) throw new Error('API error ' + resp.status);
   return resp.json();
 }
 
